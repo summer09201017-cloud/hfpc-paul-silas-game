@@ -8,14 +8,19 @@ const mtof = (m) => A4 * Math.pow(2, (m - 69) / 12)
 // 5 首「真的不一樣」的歌:各自不同的和弦進行 + 音色(波形)+ 琶音密度 + 旋律八度。
 // 選哪首就「整首」播那首(不輪替),所以 5 首聽起來明顯不同。情緒:患難中歡然讚美。
 const C = { root: 60, triad: [0, 4, 7] }, G = { root: 55, triad: [0, 4, 7] }, F = { root: 53, triad: [0, 4, 7] }
-const Am = { root: 57, triad: [0, 3, 7] }, Dm = { root: 50, triad: [0, 3, 7] }, Em = { root: 52, triad: [0, 3, 7] }, Bb = { root: 58, triad: [0, 4, 7] }
+const Am = { root: 57, triad: [0, 3, 7] }, Dm = { root: 50, triad: [0, 3, 7] }, Em = { root: 52, triad: [0, 3, 7] }
+const Bb = { root: 58, triad: [0, 4, 7] }, D = { root: 62, triad: [0, 4, 7] }
 const END = C
 const SONGS = [
   { name: '平安喜樂', prog: [C, G, Am, F],  wave: 'triangle', arpN: 2, melOct: 24 }, // 明亮抒情
   { name: '黑夜歌聲', prog: [Am, Em, F, C], wave: 'sine',     arpN: 1, melOct: 12 }, // 小調起、低柔、稀疏
-  { name: '患難讚美', prog: [Dm, Bb, F, C], wave: 'square',   arpN: 3, melOct: 19 }, // 不同調性、方波、三連音感
+  { name: '患難讚美', prog: [Dm, Bb, F, C], wave: 'square',   arpN: 3, melOct: 19 }, // 方波、三連音感
   { name: '信靠盼望', prog: [F, C, G, Am],  wave: 'triangle', arpN: 2, melOct: 24 }, // 溫暖盼望
   { name: '得勝凱歌', prog: [C, F, G, C],   wave: 'sawtooth', arpN: 4, melOct: 24 }, // 鋸齒、快琶音、凱旋
+  { name: '半夜禱告', prog: [Em, C, G, D],  wave: 'sine',     arpN: 2, melOct: 19 }, // 安靜、小調起
+  { name: '監牢頌讚', prog: [F, Dm, Bb, C], wave: 'square',   arpN: 3, melOct: 24 }, // 厚實、借用和弦
+  { name: '釋放之歌', prog: [G, D, Em, C],  wave: 'triangle', arpN: 4, melOct: 24 }, // 明亮、快、釋放
+  { name: '同心合一', prog: [C, Am, Dm, G], wave: 'sine',     arpN: 2, melOct: 12 }, // 溫暖低柔
 ]
 export const TRACK_NAMES = SONGS.map((s) => s.name)
 

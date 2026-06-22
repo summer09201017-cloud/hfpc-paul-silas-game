@@ -283,7 +283,16 @@ export class Game {
     return Math.max(0, Math.min(3, lane))
   }
 
-  songRect(i) { return { x: 300, y: 152 + i * 64, w: 360, h: 52 } }
+  songRect(i) {
+    const n = TRACK_NAMES.length
+    const cols = n > 6 ? 2 : 1
+    const rows = Math.ceil(n / cols)
+    const bw = cols === 2 ? 300 : 360, bh = 46, gy = 10, gx = 24
+    const top = Math.max(96, (540 - (rows * (bh + gy) - gy)) / 2 + 24)
+    const left = (960 - (cols * bw + (cols - 1) * gx)) / 2
+    const col = i % cols, row = (i / cols) | 0
+    return { x: left + col * (bw + gx), y: top + row * (bh + gy), w: bw, h: bh }
+  }
 
   _startCountdown(mode) {
     this.mode = mode
