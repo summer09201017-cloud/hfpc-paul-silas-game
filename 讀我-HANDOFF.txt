@@ -1,0 +1,62 @@
+============================================================
+ 彼得走海 · 定睛看耶穌 — 交接說明（2026-06-21）
+ 給 agape250 那台 PC 的 AI / 開發者
+============================================================
+
+■ 這是什麼
+  馬太福音 14:22-33 的「節奏音樂闖關」（玩法類似《周五放課夜 / FNF》）。
+  純 vanilla ES modules + Canvas、零相依、Web Audio 合成音樂、可離線(PWA)、可嵌入。
+  作者是台灣牧師(HFPC)，主日學用；繁體中文 + 和合本經文。
+  玩法=信息：定睛看耶穌=踩準節拍；漏拍(疑惑)→信心下降→下沉→「主啊救我」→耶穌伸手拉住→續關。
+
+■ 現在到哪（已完成 vs 待做）
+  已完成：節奏核心、信心條、命中判定、連擊、下沉救援、★結算、兩難度、開場故事、
+          命中水花、過關語音朗讀、合成音樂、PWA 離線、玩遊戲.bat、npm test、已上 GitHub。
+  待做：見 roadmap.md（已按 CP 值排序）。下一順位 = PWA 安裝鈕 / 接進保羅大富翁。
+
+■ 線上玩（已部署 ✅ 2026-06-21）
+  https://hfpc-peter-sea-game.netlify.app
+  已在總入口大廳點亮卡片：https://hfpc-bible-games.netlify.app
+
+■ 在 GitHub 哪裡（其他機器這樣拿）
+  https://github.com/summer09201017-cloud/hfpc-peter-sea-game
+    git clone https://github.com/summer09201017-cloud/hfpc-peter-sea-game.git
+  本機路徑(HFP PC)：C:\Users\HFP\Desktop\彼得走海
+
+■ 怎麼跑 / 測 / 建置
+  玩：    雙擊「玩遊戲.bat」  （或 node scripts/serve.mjs，自動選埠+開瀏覽器）
+  測：    npm test            （scripts/smoke-test.mjs：語法+譜面+難度窗+經文文案）
+  建置：  npm run build       （輸出到 site/，可離線部署用）
+  零相依，不用 npm install。需要電腦裝了 Node.js。
+
+■ 改哪裡（一檔一責，在 src/）
+  調手感→config.js  改譜→chart.js  改文案/經文→content.js
+  畫面→renderer.js  音樂/音效→audio.js  輸入→input.js  主迴圈/規則→game.js  朗讀→speak.js
+  詳見 CLAUDE.md。
+
+■ 節奏遊戲三個同步陷阱（別踩，CLAUDE.md 有完整版）
+  1) 判定用音訊時鐘(songPos=audio.now()-songStart)，不是 rAF。
+  2) 譜面與音樂共用同一個 BPM + 同一個起拍時間 → 鼓點上落音符。
+  3) 暫停用 ctx.suspend()/resume() 凍結音訊時鐘，別自己另開一條可暫停的時鐘。
+
+■ 本機地雷（Windows + Node 24）
+  - 別用 vite build（遞迴 cpSync 會無聲被殺）→ 用 scripts/bundle-static.mjs。
+  - .bat 必須純 ASCII + CRLF；中文路徑用 "%~dp0." 寫法。
+  - Service Worker 在 localhost 自動註銷（改碼才看得到）。
+  - Playwright 驗收：分頁失焦會節流，自動玩家會假性漏拍→不是 bug；驗 win 用 walk 模式或 window.__game._win()。
+
+■ 安全閘（已內建）
+  .claude/settings.json 有一個 PreToolUse hook：AI 要 git push 前會自動跑 npm test，
+  失敗就擋下（scripts/pre-push-check.mjs）。fail-safe：非 push 一律放行。
+
+■ 下一步最該做的一件事
+  已上線！下一步走 roadmap.md #1：PWA「安裝到主畫面」按鈕（pwa-install-button，約 15 分），
+  或 #2 接進保羅大富翁當一座站點關（embed-minigame）。
+
+■ 一鍵裝齊開發技能（skill 合輯，含本遊戲藍圖 rhythm-beat-minigame）
+  repo：summer09201017-cloud/hfpc-claude-skills（私有）
+  另一台：/plugin marketplace update hfpc-skills  或  git pull 後重跑 install.bat/install.sh
+  做新的節奏關：在 Claude Code 打  /new-rhythm-level  （從一段經文一鍵 scaffold）。
+
+榮耀歸神。
+============================================================

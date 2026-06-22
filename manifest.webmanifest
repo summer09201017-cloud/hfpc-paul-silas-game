@@ -1,0 +1,14 @@
+{
+  "name": "保羅西拉 · 在患難中讚美",
+  "short_name": "保羅西拉",
+  "description": "馬太福音 14 章節奏闖關：踩準每一拍，在患難中讚美走過海面。",
+  "start_url": ".",
+  "scope": ".",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#04060f",
+  "theme_color": "#070b1c",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

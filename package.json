@@ -1,0 +1,11 @@
+{
+  "name": "hfpc-paul-silas-game",
+  "version": "1.0.0",
+  "description": "保羅西拉 · 在患難中讚美 — 馬太福音 14 章節奏闖關（FNF 風格）。純 vanilla Canvas，零相依，可離線。",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/bundle-static.mjs",
+    "test": "node scripts/smoke-test.mjs"
+  },
+  "license": "MIT"
+}
