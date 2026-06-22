@@ -65,7 +65,9 @@ export class Game {
   boot() {
     initSpeech()
     this.input.attach(() => this.audio.now())
-    if (this.embed) { this.audio.unlock(); this._startCountdown(this.startMode) }
+    // 嵌入時也先進「選 10 首歌」畫面(走/跑由站點 mode 決定,跳過走/跑選單);選好一首再開打。
+    // 之後失敗重來走 _restart() → 直接用已選的那首倒數,不再每次重選。
+    if (this.embed) { this.audio.unlock(); this.state = 'song' }
     this.last = performance.now()
     requestAnimationFrame(t => this.loop(t))
   }
