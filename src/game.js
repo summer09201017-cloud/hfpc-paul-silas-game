@@ -197,7 +197,7 @@ export class Game {
     this.rescuePhase = Math.min(1, this.rescueT / RCFG.holdSec)
     if (this.rescuePhase >= 0.5 && !this._spokeRescue) {
       this._spokeRescue = true
-      speakScripture(this.RESCUE.word, { isMuted: () => this.muted })
+      speakScripture(this.RESCUE.word, { isMuted: () => this.muted, ref: this.RESCUE.ref })
     }
     if (this.rescuePhase >= 1) this._resume()
   }
@@ -232,7 +232,7 @@ export class Game {
       const L = this._toLogical(p.x, p.y)
       // 靜音鈕（任何狀態）
       if (inRect(L, this.buttons.mute)) { this.muted = !this.muted; this.audio.setMuted(this.muted); if (this.muted) stopSpeech(); continue }
-      if (this.state === 'paused') { this._resume(); continue }
+      if (this.state === 'paused') { this._resumeFromPause(); continue }
       if (this.state === 'play' && inRect(L, this.buttons.pause)) { this._pause(); continue }
       if (this.state === 'title') { this.audio.unlock(); this.storyIndex = 0; this.state = 'story' }
       else if (this.state === 'story') { this.audio.unlock(); this._advanceStory() }
@@ -268,7 +268,7 @@ export class Game {
     this.audio.suspend()
   }
 
-  _resume() {
+  _resumeFromPause() {
     if (this.state !== 'paused') return
     this.audio.resume()
     this.state = 'play'
