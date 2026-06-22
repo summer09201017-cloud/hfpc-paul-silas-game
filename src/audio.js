@@ -21,6 +21,7 @@ const SONGS = [
   { name: '監牢頌讚', prog: [F, Dm, Bb, C], wave: 'square',   arpN: 3, melOct: 24 }, // 厚實、借用和弦
   { name: '釋放之歌', prog: [G, D, Em, C],  wave: 'triangle', arpN: 4, melOct: 24 }, // 明亮、快、釋放
   { name: '同心合一', prog: [C, Am, Dm, G], wave: 'sine',     arpN: 2, melOct: 12 }, // 溫暖低柔
+  { name: '頌讚到底', prog: [G, Em, C, D],  wave: 'sawtooth', arpN: 3, melOct: 24 }, // 驅動、堅持讚美
 ]
 export const TRACK_NAMES = SONGS.map((s) => s.name)
 
