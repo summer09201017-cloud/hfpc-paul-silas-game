@@ -1,5 +1,5 @@
 // sw.js — 離線快取（app shell）。改版時把 CACHE 版本號 +1。
-const CACHE = 'paul-silas-v4'
+const CACHE = 'paul-silas-v5'
 const ASSETS = [
   './',
   './index.html',
