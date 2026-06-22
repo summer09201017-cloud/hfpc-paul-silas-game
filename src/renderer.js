@@ -3,6 +3,7 @@
 // 彼得在左、耶穌在右，都在橋的左右兩側、不被音符蓋住。
 
 import { VIEW, HIGHWAY, LANE_COLORS, LANE_DIR, FAITH } from './config.js'
+import { TRACK_NAMES } from './audio.js'
 
 const W = VIEW.W, H = VIEW.H
 const SEA_Y = 372          // 海面基線
@@ -57,6 +58,7 @@ export class Renderer {
     if (s === 'title') this._title(game)
     if (s === 'story') this._story(game)
     if (s === 'mode') this._mode(game)
+    if (s === 'song') this._songSelect(game)
     if (s === 'win') this._win(game)
     if (s === 'play' || s === 'paused') this._pauseBtn(game)
     if (s === 'paused') this._pauseOverlay(game)
@@ -156,12 +158,12 @@ export class Renderer {
     ctx.beginPath(); ctx.arc(hx, hy - 3, 12, Math.PI, 2 * Math.PI); ctx.fill()   // 頭髮
     ctx.beginPath(); ctx.arc(hx, hy + 8, 7, 0.2, Math.PI - 0.2); ctx.fill()       // 鬍（較低）
     // ★ 臉：眼睛 + 眉毛 + 唱歌的嘴
-    this._singFace(ctx, hx, hy, dir, joy)
+    this._singFace(ctx, hx, hy, dir, joy, 0.5 + 0.5 * Math.sin(beat * 2))
     ctx.restore()
   }
 
   // 臉：兩眼（望天）＋眉（喜樂上揚）＋張口歌唱
-  _singFace(ctx, hx, hy, dir, joy) {
+  _singFace(ctx, hx, hy, dir, joy, mouthOpen = 0.5) {
     const ex = 4.4, ey = hy - 1
     if (joy > 0.5) { ctx.fillStyle = `rgba(232,120,90,${(joy - 0.5) * 0.6})`; ctx.beginPath(); ctx.arc(hx - 6.5, hy + 3, 2.6, 0, 7); ctx.arc(hx + 6.5, hy + 3, 2.6, 0, 7); ctx.fill() }
     for (const sx of [-ex, ex]) {
@@ -173,7 +175,7 @@ export class Renderer {
     ctx.beginPath(); ctx.moveTo(hx - ex - 2.6, ey - 4 - br * 0.3); ctx.lineTo(hx - ex + 2, ey - 5 - br); ctx.stroke()
     ctx.beginPath(); ctx.moveTo(hx + ex - 2, ey - 5 - br); ctx.lineTo(hx + ex + 2.6, ey - 4 - br * 0.3); ctx.stroke()
     // 嘴：張口歌唱（越喜樂張越大）
-    const mh = 2.4 + joy * 6.5
+    const mh = 1.6 + (1.4 + joy * 5.5) * mouthOpen
     ctx.fillStyle = '#3a1d1d'; ctx.beginPath(); ctx.ellipse(hx + dir * 0.5, hy + 4, 2.8 + joy * 1.8, mh, 0, 0, 7); ctx.fill()
   }
 
@@ -588,6 +590,24 @@ export class Renderer {
     const a = 0.5 + 0.5 * Math.sin(game.time * 3)
     ctx.globalAlpha = a; ctx.fillStyle = '#cfe0ff'; ctx.font = '600 16px system-ui,sans-serif'
     ctx.fillText(last ? '輕點開始 ▸' : '輕點繼續 ▸', W / 2, py - 24); ctx.globalAlpha = 1
+  }
+
+  _songSelect(game) {
+    const ctx = this.ctx
+    ctx.fillStyle = 'rgba(4,6,15,0.62)'; ctx.fillRect(0, 0, W, H)
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+    ctx.fillStyle = '#fff'; ctx.font = '800 30px system-ui,sans-serif'
+    ctx.fillText('選一首讚美的歌', W / 2, 108)
+    ctx.fillStyle = 'rgba(220,230,255,0.65)'; ctx.font = '500 16px system-ui,sans-serif'
+    ctx.fillText('每首旋律不同,挑一首開始這次的讚美', W / 2, 138)
+    for (let i = 0; i < TRACK_NAMES.length; i++) {
+      const b = game.songRect(i), hov = game.hover === 'song' + i
+      ctx.fillStyle = hov ? 'rgba(122,90,168,0.95)' : 'rgba(40,30,60,0.82)'
+      roundRect(ctx, b.x, b.y, b.w, b.h, 12); ctx.fill()
+      ctx.strokeStyle = 'rgba(200,180,255,0.5)'; ctx.lineWidth = 1.5; ctx.stroke()
+      ctx.fillStyle = '#fff'; ctx.font = '700 20px system-ui,sans-serif'
+      ctx.fillText('🎵 ' + TRACK_NAMES[i], b.x + b.w / 2, b.y + b.h / 2)
+    }
   }
 
   _mode(game) {

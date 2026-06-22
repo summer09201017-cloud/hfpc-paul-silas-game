@@ -15,6 +15,8 @@ const TRACKS = [
   [{ root: 53, triad: [0, 4, 7] }, { root: 60, triad: [0, 4, 7] }, { root: 55, triad: [0, 4, 7] }, { root: 57, triad: [0, 3, 7] }], // F C G Am
 ]
 
+export const TRACK_NAMES = ['平安喜樂','黑夜歌聲','患難讚美','信靠盼望','得勝凱歌']
+
 export class Audio {
   constructor() {
     this.ctx = null
@@ -84,8 +86,9 @@ export class Audio {
   }
 
   // ================= 音樂排程 =================
-  startSong(bpm, endBeats) {
+  startSong(bpm, endBeats, songStart = 0) {
     if (!this.ctx) return 0
+    this._songIdx = songStart | 0
     this.spb = 60 / bpm
     this.beat = 0
     this.endBeat = endBeats
@@ -111,7 +114,7 @@ export class Audio {
     const inBar = beat % 4
     // 結尾兩小節解到 C，給「上船、風住了」的安定
     const endBars = Math.floor(this.endBeat / 4)
-    const track = TRACKS[Math.floor(bar / 4) % TRACKS.length]   // 每 4 小節換一首
+    const track = TRACKS[(Math.floor(bar / 4) + (this._songIdx || 0)) % TRACKS.length]   // 每 4 小節換一首;從玩家選的那首開始
     const chord = bar >= endBars - 1 ? END : track[bar % track.length]
     const spb = this.spb
 

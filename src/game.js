@@ -5,7 +5,7 @@
 import { VIEW, HIGHWAY, DIFF, SCORE, STARS, COUNT_BEATS, RESCUE as RCFG, FAITH } from './config.js'
 import { makeChart } from './chart.js'
 import { Input } from './input.js'
-import { Audio } from './audio.js'
+import { Audio, TRACK_NAMES } from './audio.js'
 import { Renderer } from './renderer.js'
 import { initSpeech, speakScripture, stopSpeech } from './speak.js'
 import * as C from './content.js'
@@ -237,8 +237,10 @@ export class Game {
       if (this.state === 'title') { this.audio.unlock(); this.storyIndex = 0; this.state = 'story' }
       else if (this.state === 'story') { this.audio.unlock(); this._advanceStory() }
       else if (this.state === 'mode') {
-        if (inRect(L, this.buttons.walk)) { this.audio.unlock(); this._startCountdown('walk') }
-        else if (inRect(L, this.buttons.run)) { this.audio.unlock(); this._startCountdown('run') }
+        if (inRect(L, this.buttons.walk)) { this.audio.unlock(); this.startMode = 'walk'; this.state = 'song' }
+        else if (inRect(L, this.buttons.run)) { this.audio.unlock(); this.startMode = 'run'; this.state = 'song' }
+      } else if (this.state === 'song') {
+        for (let i = 0; i < TRACK_NAMES.length; i++) { if (inRect(L, this.songRect(i))) { this._songIdx = i; this._startCountdown(this.startMode); break } }
       } else if (this.state === 'win') {
         if (inRect(L, this.buttons.again)) this._restart()
         else if (inRect(L, this.buttons.listen)) speakScripture(`${this.WIN.head}。${this.WIN.verse}。${this.WIN.refSpoken || ''}`, { isMuted: () => this.muted })
@@ -257,6 +259,7 @@ export class Game {
     if (this.state === 'paused' && inRect({ x, y }, B.resume)) return 'resume'
     if (this.state === 'title' && inRect({ x, y }, B.start)) return 'start'
     if (this.state === 'mode') { if (inRect({ x, y }, B.walk)) return 'walk'; if (inRect({ x, y }, B.run)) return 'run' }
+    if (this.state === 'song') { for (let i = 0; i < TRACK_NAMES.length; i++) if (inRect({ x, y }, this.songRect(i))) return 'song' + i }
     if (this.state === 'win' && inRect({ x, y }, B.again)) return 'again'
     if (this.state === 'win' && inRect({ x, y }, B.listen)) return 'listen'
     return null
@@ -280,6 +283,8 @@ export class Game {
     return Math.max(0, Math.min(3, lane))
   }
 
+  songRect(i) { return { x: 300, y: 152 + i * 64, w: 360, h: 52 } }
+
   _startCountdown(mode) {
     this.mode = mode
     this.diff = DIFF[mode]
@@ -296,7 +301,7 @@ export class Game {
   }
 
   _startPlay() {
-    this.songStart = this.audio.startSong(this.diff.bpm, this.chart.endBeats)
+    this.songStart = this.audio.startSong(this.diff.bpm, this.chart.endBeats, this._songIdx || 0)
     this.songPos = 0
     this.state = 'play'
   }
