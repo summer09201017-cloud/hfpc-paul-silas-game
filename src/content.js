@@ -40,7 +40,7 @@ export const SINK_CRY = '在患難中…還唱得下去嗎？'
 export const RESCUE = {
   line: '不要灰心，再揚聲歌唱',
   word: '你們要靠主常常喜樂。我再說，你們要喜樂。',
-  ref: '腓 4:4',
+  ref: '腓立比書 4:4',
 }
 
 // 過關（半夜的讚美之後）
