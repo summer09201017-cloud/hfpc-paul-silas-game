@@ -239,8 +239,8 @@ export class Game {
       if (this.state === 'title') { this.audio.unlock(); this.storyIndex = 0; this.state = 'story' }
       else if (this.state === 'story') { this.audio.unlock(); this._advanceStory() }
       else if (this.state === 'mode') {
-        if (inRect(L, this.buttons.walk)) { this.audio.unlock(); this.startMode = 'walk'; this.state = 'song' }
-        else if (inRect(L, this.buttons.run)) { this.audio.unlock(); this.startMode = 'run'; this.state = 'song' }
+        if (inRect(L, this.buttons.walk)) { this.audio.unlock(); this.startMode = 'walk'; this.state = 'song'; window.psPing?.('paul-silas-start'); this._psT0 = Date.now() }
+        else if (inRect(L, this.buttons.run)) { this.audio.unlock(); this.startMode = 'run'; this.state = 'song'; window.psPing?.('paul-silas-start'); this._psT0 = Date.now() }
       } else if (this.state === 'song') {
         for (let i = 0; i < TRACK_NAMES.length; i++) { if (inRect(L, this.songRect(i))) { this._songIdx = i; this._startCountdown(this.startMode); break } }
       } else if (this.state === 'win') {
@@ -326,6 +326,7 @@ export class Game {
     this.result = { acc, maxCombo: this.maxCombo, stumbles: this.stumbles, stars, score: this.score }
     this.progress = 1
     this.state = 'win'
+    window.psPing?.('paul-silas-done', this._psT0 ? Math.round((Date.now() - this._psT0) / 1000) : 0)
     speakScripture(`${this.WIN.head}。${this.WIN.verse}。${this.WIN.refSpoken || ''}`, { isMuted: () => this.muted })
     this.onComplete({ won: true, score: this.score, stars })
   }

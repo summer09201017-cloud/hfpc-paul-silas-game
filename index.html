@@ -16,5 +16,20 @@
   </div>
   <div id="rotate">請把手機轉成<br>橫向 ⟳ 來玩</div>
   <script type="module" src="main.js"></script>
+    <script>
+      // play-stats 三層匿名計數(lobby-play-rank §3/§4):開啟 10 分去重;-start/-done 不去重;-done 帶 t=秒。零個資。
+      window.psPing = function (key, t) {
+        try {
+          if (!location.hostname.endsWith('netlify.app')) return;
+          var u = 'https://hfpc-play-stats.summer09201017.workers.dev/api/ping?g=' + key + (t ? '&t=' + t : '');
+          if (navigator.sendBeacon) navigator.sendBeacon(u); else fetch(u, { mode: 'no-cors' });
+        } catch (_) {}
+      };
+      try {
+        var psK = 'ps-last-paul-silas';
+        var psLast = parseInt(localStorage.getItem(psK) || '0', 10);
+        if (Date.now() - psLast > 600000) { localStorage.setItem(psK, String(Date.now())); window.psPing('paul-silas'); }
+      } catch (_) { window.psPing('paul-silas'); }
+    </script>
 </body>
 </html>
