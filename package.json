@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "node scripts/bundle-static.mjs",
-    "test": "node scripts/smoke-test.mjs"
+    "test": "node scripts/smoke-test.mjs && node scripts/verify-tts.mjs"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "msedge-tts": "^2.0.7"
+  }
 }
