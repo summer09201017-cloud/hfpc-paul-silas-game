@@ -24,6 +24,27 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const OUT = join(root, 'tts')
 mkdirSync(OUT, { recursive: true })
 
+// ⚠⚠ 逐層刪,**不可以用 rmSync({recursive:true})**——本機 Windows + Node 24 上遞迴版會
+//   「無聲被砍」:整個 node 行程當場消失,exit 127、stdout 一個字都沒有,看起來像腳本壞了。
+//   (這條 scripts/bundle-static.mjs 第 2 行早就寫著,我 0813 還是踩了一次才想起來
+//    —— 知識寫在別的檔案的註解裡 = 沒有人會再看到它。)
+{
+  const { readdirSync, rmSync: rmFile, rmdirSync, statSync: st } = await import('node:fs')
+  let swept = 0
+  try {
+    for (const n of readdirSync(OUT)) {
+      if (!n.startsWith('_tmp_')) continue
+      const d = join(OUT, n)
+      try {
+        for (const f of readdirSync(d)) rmFile(join(d, f))   // 暫存夾只有一層,不需遞迴
+        if (st(d).isDirectory()) rmdirSync(d)
+        swept++
+      } catch { /* 這一個刪不掉就跳過,別讓清理擋住烤製 */ }
+    }
+  } catch { /* 目錄還不存在 */ }
+  if (swept) console.log(`  🧹 掃掉 ${swept} 個上一輪殘留的暫存夾`)
+}
+
 const list = JSON.parse(readFileSync(join(root, 'scripts', 'tts-verses.json'), 'utf8'))
 const manifestPath = join(OUT, 'manifest.json')
 let manifest = {}
@@ -31,7 +52,7 @@ try { manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) } catch { /* 第
 
 const VOICE = 'zh-TW-HsiaoChenNeural' // 曉臻(女聲,唸經文柔和);男聲可換 zh-TW-YunJheNeural
 
-const { renameSync, rmSync, statSync } = await import('node:fs')
+const { renameSync, rmSync, statSync, readdirSync: readdirSync2, rmdirSync: rmdirSync2 } = await import('node:fs')
 const saveManifest = () => writeFileSync(manifestPath, JSON.stringify(manifest, null, 1) + '\n', 'utf8')
 
 let made = 0, skipped = 0, failed = 0
@@ -59,12 +80,26 @@ for (const entry of list) {
     failed++
     console.error(`  ✗ ${full.slice(0, 24)}… → ${e && e.message}`)
   } finally {
-    try { rmSync(tmpDir, { recursive: true, force: true }) } catch { /* noop */ }
+    // ⚠⚠ 0813:這裡原本是 rmSync(tmpDir,{recursive:true}) —— 就是它在 Windows+Node 24 上
+    //   「無聲砍掉整個 node 行程」,而不是 msedge-tts 的錯。長年被記成「一次烤一句 node 就死
+    //   (exit 127)」的那個現象,真兇是這一行。改逐層刪之後可以一口氣烤完整批。
+    try {
+      for (const f of readdirSync2(tmpDir)) rmSync(join(tmpDir, f))
+      rmdirSync2(tmpDir)
+    } catch { /* noop */ }
   }
 }
-console.log(`✓ gen-tts:新產 ${made}、已存在 ${skipped}、失敗 ${failed};manifest 共 ${Object.keys(manifest).length} 句 → tts/`)
-// ⚠ 這裡刻意用 process.exit 而非 exitCode(與守門 #36 的通則相反,是有意的例外):
-//   msedge-tts 的 WebSocket 不會自己關,用 exitCode 會讓 node 永遠掛著不結束。
-//   代價=離開碼在這台機器上偶爾會被 libuv 打亂(實測 exit 127),所以**判斷完成看的是
-//   「新產 0」那行字,不是離開碼**;manifest 逐句落盤,重跑不丟進度。
-process.exit(failed ? 1 : 0)
+const summary = (`✓ gen-tts:新產 ${made}、已存在 ${skipped}、失敗 ${failed};manifest 共 ${Object.keys(manifest).length} 句 → tts/`)
+// ⚠⚠ 0813 實測踩到的坑,寫清楚免得下一手改壞:
+//   原本是直接 `console.log(summary); process.exit(...)`。當**每一句都已存在**(第二次以後重跑)時,
+//   整支腳本瞬間跑完,而 stdout 接的是管線(pipe)時 console.log 是**非同步**的
+//   ⇒ process.exit() 會把還沒送出去的那行**整行截斷** ⇒ 畫面上什麼都沒有、離開碼還是 127。
+//   ★ 後果很嚴重:這支腳本的**完成訊號就是「新產 0」那行字**(離開碼在這台機器不可信),
+//     訊號被吞掉 = 看起來像「烤失敗了」,而其實六句全都好好的。
+//   ⇒ 改成:把 summary 交給 write 的 callback,**確定送出去了才結束**;
+//     而且只有真的開過 WebSocket(made>0)才需要強制 exit,否則讓 node 自然結束。
+//   (同族:守門 #36 exit-after-fetch-guard——fetch/socket 之後 process.exit 會亂。)
+process.exitCode = failed ? 1 : 0
+process.stdout.write(summary + '\n', () => {
+  if (made > 0) process.exit(failed ? 1 : 0) // WebSocket 不會自己關,只有這種情況要強制收尾
+})
