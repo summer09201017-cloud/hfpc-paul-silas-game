@@ -11,3 +11,10 @@
   for = "/sw.js"
   [headers.values]
     Cache-Control = "no-cache"
+
+# 0817 搬遷 Cloudflare Pages:舊網址(含已安裝的舊 PWA)全部 301 到新家,留置一個月後關站
+[[redirects]]
+  from = "/*"
+  to = "https://hfpc-paul-silas-game.pages.dev/:splat"
+  status = 301
+  force = true
