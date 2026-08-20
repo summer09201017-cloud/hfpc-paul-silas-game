@@ -4,3 +4,6 @@ site/
 *.log
 .netlify
 .claude/settings.local.json
+
+# Local wrangler folder
+.wrangler/

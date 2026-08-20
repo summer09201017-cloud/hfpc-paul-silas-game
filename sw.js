@@ -5,7 +5,7 @@
 //     退回 Web Speech 機器聲（使用者 0730 明令禁止的那種）。零錯誤、零紅燈，
 //     只有真的按下朗讀鍵的人聽得出來 —— 屬「不會亮紅燈的錯」那一族。
 //   ★ mp3 進 ASSETS = 教室沒網路也有人聲（本站賣點就是離線可用）。
-const CACHE = 'paul-silas-v12'
+const CACHE = 'paul-silas-v13'
 const ASSETS = [
   './',
   './index.html',
@@ -46,3 +46,8 @@ self.addEventListener('fetch', (e) => {
     }).catch(() => caches.match('./index.html')))
   )
 })
+
+// 🏷️ 版號回報(0820 全艦隊批次):頁尾徽章問「實際執行中的版本」,答案=本 SW 的快取名。
+self.addEventListener('message', function (e) {
+  if (e && e.data === 'GET_VERSION' && e.source) e.source.postMessage({ type: 'SW_VERSION', v: CACHE });
+});
