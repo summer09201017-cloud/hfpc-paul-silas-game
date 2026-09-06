@@ -5,7 +5,7 @@
 //     退回 Web Speech 機器聲（使用者 0730 明令禁止的那種）。零錯誤、零紅燈，
 //     只有真的按下朗讀鍵的人聽得出來 —— 屬「不會亮紅燈的錯」那一族。
 //   ★ mp3 進 ASSETS = 教室沒網路也有人聲（本站賣點就是離線可用）。
-const CACHE = 'paul-silas-v13'
+const CACHE = 'paul-silas-v14'
 const ASSETS = [
   './',
   './index.html',
